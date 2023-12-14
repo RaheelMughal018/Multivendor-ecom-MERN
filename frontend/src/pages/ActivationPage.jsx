@@ -6,37 +6,42 @@ import { toast } from "react-toastify";
 
 const ActivationPage = () => {
   const { activation_token } = useParams();
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (activation_token) {
-      const sendResponce = async () => {
-        try {
-          const res = await axios
-            .post(`${server}/user/activation`, { activation_token })
-            .then((res) => {
-              toast.success("Account created successfully");
-            });
+    const sendResponse = async () => {
+      try {
+        const res = await axios.post(`${server}/user/activation`, {
+          activation_token,
+        });
 
-          console.log(
-            "🚀 ~ file: ActivationPage.jsx:16 ~ activationEmail ~ res:",
-            res.data.message
-          );
-        } catch (error) {
-          console.log(
-            "🚀 ~ file: ActivationPage.jsx:18 ~ activationEmail ~ error:",
-            error.response.data.message
-          );
-          setError(true);
-        }
-      };
-      sendResponce();
+        console.log("Activation success:", res.data.message);
+        toast.success("Account created successfully");
+      } catch (error) {
+        console.error(
+          "Activation error:",
+          error.response.data.error || "Unknown error"
+        );
+        setError(
+          error.response.data.error || "An error occurred during activation."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (activation_token) {
+      sendResponse();
     }
   }, [activation_token]);
+
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      {error ? (
-        <p>Your token is expired!</p>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
       ) : (
         <p>Your account has been created successfully</p>
       )}

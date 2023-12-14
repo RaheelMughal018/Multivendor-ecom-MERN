@@ -32,13 +32,13 @@ const SignUp = () => {
       .post(`${server}/user/create-user`, newForm, config)
       .then((res) => {
         toast.success(res.data.message);
+        setName("");
+        setEmail("");
+        setPassword("");
+        setAvatar(null);
       })
-      .catch((err) => {
-        console.log(
-          "🚀 ~ file: SignUp.jsx:37 ~ handleSubmit ~ err:",
-          err.response.data.message
-        );
-        toast.error(err.response.data.message);
+      .catch((error) => {
+        toast.error(error.response.data.message);
       });
   };
 

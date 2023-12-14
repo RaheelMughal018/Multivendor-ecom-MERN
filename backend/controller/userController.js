@@ -9,6 +9,7 @@ const router = express.Router();
 const sendMail = require("../utils/sendMail");
 const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
+const { isAuthenticated } = require("../middlewares/auth");
 
 // create user
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
@@ -17,8 +18,6 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
     const userEmail = await User.findOne({ email });
 
     if (userEmail) {
-      console.log("User with email already exists:", email);
-
       const filename = req.file.filename;
       const filePath = `uploads/${filename}`;
       fs.unlink(filePath, (err) => {
@@ -31,11 +30,8 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
           res.json({ message: "File deleted successfully" });
         }
       });
-
       return next(new ErrorHandler("User already exists", 400));
     }
-
-    console.log("Creating user:", name, email);
 
     const filename = req.file.filename;
     const fileUrl = path.join(filename);
@@ -60,29 +56,24 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
         message: `Hello ${user.name}, please click on the link to activate your account: ${activationUrl}`,
       });
 
-      console.log("Activation email sent to:", user.email);
-
       res.status(201).json({
         status: "success",
         message: `Please check your email: ${user.email} to activate your account!`,
         activation_token: activationToken,
       });
     } catch (error) {
-      console.error("Error sending activation email:", error.message);
       return next(new ErrorHandler(error.message, 500));
     }
   } catch (error) {
-    console.error("Error creating user:", error.message);
     return next(new ErrorHandler(error.message, 400));
   }
 });
 
 const createActivationToken = (user) => {
-  const activationToken = jwt.sign(user, process.env.ACTIVATION_SECRET, {
+  const activationToken = jwt.sign(user, process.env.JWT_SECRET_KEY, {
     expiresIn: "10m",
   });
-  console.log("Activation token:", activationToken);
-  console.log("Activation secret:", process.env.ACTIVATION_SECRET);
+
   return activationToken;
 };
 
@@ -92,26 +83,16 @@ router.post(
   catchAsyncError(async (req, res, next) => {
     try {
       const { activation_token } = req.body;
-      console.log("Received activation token:", activation_token);
 
-      const newUser = jwt.verify(
-        activation_token,
-        process.env.ACTIVATION_SECRET
-      );
-      console.log(
-        "🚀 ~ file: userController.js:96 ~ catchAsyncError ~ activation_token,:",
-        activation_token
-      );
+      const newUser = jwt.verify(activation_token, process.env.JWT_SECRET_KEY);
 
       if (!newUser) {
-        console.log("Invalid activation token:", activation_token);
         return next(new ErrorHandler("Invalid token", 400));
       }
       const { name, email, password, avatar } = newUser;
-      console.log("Activating user:", name, email);
+
       let user = await User.findOne({ email });
       if (user) {
-        console.log("User already exists during activation:", email);
         return next(new ErrorHandler("User already exsist", 400));
       }
       user = await User.create({
@@ -120,11 +101,64 @@ router.post(
         email,
         avatar,
       });
-      console.log("User activated and created in the database:", user);
 
       sendToken(user, 201, res);
     } catch (error) {
-      console.error("Error activating user:", error.message);
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// login user
+router.post(
+  "/login-user",
+  catchAsyncError(async (req, res, next) => {
+    try {
+      // get data from user
+      const { email, password } = req.body;
+
+      // require all fields
+      if (!(email && password)) {
+        return next(new ErrorHandler("Please enter email and password!", 400));
+      }
+      // find user in DB
+      const user = await User.findOne({ email }).select("+password");
+
+      if (!user) {
+        return next(new ErrorHandler("User already exsist!", 400));
+      }
+      // validation of password
+      const isPasswordMatched = await user.comparePasswords(password);
+
+      if (!isPasswordMatched) {
+        return next(new ErrorHandler("Incorrect Credentials", 400));
+      }
+
+      sendToken(user, 200, res);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// load user
+router.get(
+  "/get-user",
+  isAuthenticated,
+  catchAsyncError(async (req, res, next) => {
+    try {
+      // find user in DB
+      const user = await User.findById(req.user.id);
+
+      //user doesn't exsist
+      if (!user) {
+        return next(new ErrorHandler("User doesn't exsist!", 400));
+      }
+      res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
   })
