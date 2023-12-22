@@ -12,7 +12,10 @@ import { BiMenuAltLeft } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import DropDown from "./DropDown.jsx";
 import Navbar from "./Navbar.jsx";
+import { useSelector } from "react-redux";
 const Header = ({ activeHeading }) => {
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+  console.log("🚀 ~ file: Header.jsx:18 ~ Header ~ user:", user);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setsearchData] = useState(null);
   const [active, setActive] = useState(false);
@@ -150,9 +153,15 @@ const Header = ({ activeHeading }) => {
               </span>
             </div>
             <div className="relative cursor-pointer mr-[15px]">
-              <Link to={"/login"}>
-                <CgProfile size={30} color="rgb(255 255 255 /83%)" />
-              </Link>
+              {isAuthenticated ? (
+                <Link to={"/profile"}>
+                  {/* <img src={user.avatar} alt="" /> */}
+                </Link>
+              ) : (
+                <Link to={"/login"}>
+                  <CgProfile size={30} color="rgb(255 255 255 /83%)" />
+                </Link>
+              )}
             </div>
           </div>
         </div>

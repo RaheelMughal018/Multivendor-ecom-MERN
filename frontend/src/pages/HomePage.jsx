@@ -3,6 +3,11 @@ import Header from "../components/layouts/Header.jsx";
 import Hero from "../components/Route/Hero/Hero.jsx";
 import Categories from "../components/Route/Categories/Categories.jsx";
 import BestDeals from "../components/Route/BestDeals/BestDeals.jsx";
+import FeaturedProducts from "../components/Route/FeaturedProducts/FeaturedProducts.jsx";
+import Events from "../components/Route/Events/Events.jsx";
+import Sponsored from "../components/Route/Sponsored/Sponsored.jsx";
+import Footer from "../components/layouts/Footer.jsx";
+
 const HomePage = () => {
   return (
     <div>
@@ -10,6 +15,10 @@ const HomePage = () => {
       <Hero />
       <Categories />
       <BestDeals />
+      <Events />
+      <FeaturedProducts />
+      <Sponsored />
+      <Footer />
     </div>
   );
 };
