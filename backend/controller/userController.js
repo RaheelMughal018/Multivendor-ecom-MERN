@@ -156,7 +156,7 @@ router.get(
       }
       res.status(200).json({
         success: true,
-        data: user,
+        user,
       });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
