@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/styles";
 import {
   AiFillHeart,
   AiOutlineHeart,
+  AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 
@@ -115,19 +116,178 @@ const ProductDetails = ({ data }) => {
                   </div>
                 </div>
                 <div
-                  className={`${styles.button}flex items-center h-11 mt-8 rounded`}
+                  className={`${styles.button}flex items-center !h-11 mt-8 rounded`}
                 >
                   <span className="text-white flex items-center">
                     Add to Cart
                     <AiOutlineShoppingCart className="ml-1" />
                   </span>
                 </div>
+                <div className="flex items-center p-8">
+                  <img
+                    src={data.shop.shop_avatar.url}
+                    alt=""
+                    className="w-[50px] h-[50px] rounded-full"
+                  />
+                  <div className="pr-8 m-3">
+                    <h3 className={`${styles.shop_name} pb-1 pt-1`}>
+                      {data.shop.name}
+                    </h3>
+                    <h5 className="pb-3 text-[15px]">
+                      ({data.shop.ratings}) Ratings
+                    </h5>
+                  </div>
+                  <div
+                    onClick={handlesubmitMessage}
+                    className={`${styles.button} mt-4 rouned h-11 bg-[#6443d1]`}
+                  >
+                    <span className="text-white flex items-center">
+                      Send Message <AiOutlineMessage className="ml-1" />
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          <ProductDetailsInfo data={data} />
+          <br />
+          <br />
         </div>
       ) : null}
     </div>
+  );
+};
+
+const ProductDetailsInfo = ({ data }) => {
+  const [active, setActive] = useState(1);
+  return (
+    <>
+      <div className="bg-[#f5f6f6] px-3 800px:px-10 py-2 rounded">
+        <div className="flex border-b justify-between w-full pt-10 pb-2">
+          <div className="relative">
+            <h5
+              onClick={() => setActive(1)}
+              className="text-black text-[18px] px-1 leading-5 font-[600] cursor-pointer 800px:text-[20px]"
+            >
+              Product Details
+            </h5>
+            {active === 1 ? (
+              <div className={`${styles.active_indicator}`}></div>
+            ) : null}
+          </div>
+          <div className="relative">
+            <h5
+              onClick={() => setActive(2)}
+              className="text-black text-[18px] px-1 leading-5 font-[600] cursor-pointer 800px:text-[20px]"
+            >
+              Product Reviews
+            </h5>
+            {active === 2 ? (
+              <div className={`${styles.active_indicator}`}></div>
+            ) : null}
+          </div>
+          <div className="relative">
+            <h5
+              onClick={() => setActive(3)}
+              className="text-black text-[18px] px-1 leading-5 font-[600] cursor-pointer 800px:text-[20px]"
+            >
+              Seller Information
+            </h5>
+            {active === 3 ? (
+              <div className={`${styles.active_indicator}`}></div>
+            ) : null}
+          </div>
+        </div>
+        {active === 1 ? (
+          <>
+            <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus,
+              corporis veniam quis distinctio repellat eius aliquam similique
+              llaborum voluptatum deleniti ratione porro eaque ducimus non, vel
+              nisi incidunt saepe consequuntur ad expedita? Aliquid,
+              voluptatibus asperiores! Sint beatae sit quas dolorem similique,
+              est necessita officiis. Nobis, cupiditate recusandae esse debitis
+              aut quae ullam amet obcaecati sunt quasi. Eum ullam sed inventore
+              numquam dolore at architecto. Minima et doloremque voluptatum
+              reiciendis cum! Temporibus perspiciatis qui fuga.
+            </p>
+            <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus,
+              corporis veniam quis distinctio repellat eius aliquam similique
+              libero laudantium sunt nulla tempore officia iusto nesciunt quod
+              explicabo! Reiciendis, amet doloribus. Magnam quas rem, quaerat
+              sit ullam accusamus ipsum omnis officiis natus et eligendi aperiam
+              dolorem iusto dolore eius consectetur aut. Excepturi maiores
+              voluptatem eaq Temporibus perspiciatis qui fuga.
+            </p>
+            <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus,
+              corporis veniam quis distinctio repellat eius aliquam similique
+              libero laudantium sunt nulla tempore officia iusto nesciunt quod
+              explicabo! Reiciendis, amet doloribus. Magnam quas rem, quaerat
+              sit ull totam nostrum! illum dolor corporis nostrum nisi delectus
+              eius cupiditate ipsum nihil labore optio earum! Quibusdam,
+              voluptatibus placeat. fuga.
+            </p>
+          </>
+        ) : null}
+        {active === 2 ? (
+          <div className=" w-full justify-center min-h-[40vh] flex items-center">
+            <p>No Reviews yet!</p>
+          </div>
+        ) : null}
+        {active === 3 && (
+          <div className="w-full block 800px:flex p-5">
+            <div className="w-full 800px:w-[50%]">
+              <Link to={`/shop/preview/${data.shop._id}`}>
+                <div className="flex items-center">
+                  <img
+                    src={`${data.shop.shop_avatar.url}`}
+                    className="w-[50px] h-[50px] rounded-full"
+                    alt=""
+                  />
+                  <div className="pl-3">
+                    <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
+                    <h5 className="pb-2 text-[15px]">
+                      ({data.shop.ratings}) Ratings
+                    </h5>
+                  </div>
+                </div>
+              </Link>
+              <p className="pt-2">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nisi
+                labore impedit aut, magni incidunt sunt, illo tempore eum vitae
+                tenetur voluptatem ut consequatur nesciunt delectus mollitia!
+                Atque sed saepe enim.
+              </p>
+            </div>
+            <div className="w-full 800px:w-[50%] mt-5 800px:mt-0 800px:flex flex-col items-end">
+              <div className="text-left">
+                <h5 className="font-[600]">
+                  Joined on:
+                  <span className="font-[500]">23 Jan,2024</span>
+                </h5>
+                <h5 className="font-[600] pt-3">
+                  Total Products:
+                  <span className="font-[500]">1,233</span>
+                </h5>
+                <h5 className="font-[600] pt-3">
+                  Total Reviews:
+                  <span className="font-[500]">131</span>
+                </h5>
+                <Link to="/">
+                  <div
+                    className={`${styles.button} !rounded-[4px] !h-[39.5px] mt-3`}
+                  >
+                    <h4 className="text-white">Visit Shop</h4>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
