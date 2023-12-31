@@ -9,7 +9,7 @@ const SuggestedProduct = ({ data }) => {
   useEffect(() => {
     const d =
       productData && productData.filter((i) => i.category === data.category);
-    console.log("🚀 ~ file: SuggestedProduct.jsx:10 ~ useEffect ~ d:", d);
+    // console.log("🚀 ~ file: SuggestedProduct.jsx:10 ~ useEffect ~ d:", d);
     setProducts(d);
   }, []);
   return (
