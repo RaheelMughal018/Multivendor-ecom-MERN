@@ -25,9 +25,9 @@ const Login = () => {
         { withCredentials: true }
       )
       .then((res) => {
-        window.location.reload(true);
-        navigate("/");
         toast.success("Logged in Successfully");
+        navigate("/");
+        window.location.reload(true);
       })
       .catch((err) => {
         toast.error("Incorrect credientials");

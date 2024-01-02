@@ -9,9 +9,28 @@ import { MdOutlineTrackChanges } from "react-icons/md";
 import { TbAddressBook } from "react-icons/tb";
 import { RxPerson } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { server } from "../../server";
+import { toast } from "react-toastify";
 
 const ProfileSideBar = ({ active, setActive }) => {
   const navigate = useNavigate();
+
+  const logoutHandler = () => {
+    axios
+      .get(`${server}/user/logout`, { withCredentials: true })
+      .then((res) => {
+        toast.success(res.data.message);
+        window.location.reload(true);
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(
+          "🚀 ~ file: ProfileSideBar.jsx:25 ~ axios.get ~ err:",
+          err.response.data.message
+        );
+      });
+  };
   return (
     <div className="w-full bg-white shadow-sm rounded-[10px] p-4 pt-8 ">
       <div
@@ -94,7 +113,7 @@ const ProfileSideBar = ({ active, setActive }) => {
       <div
         className="flex items-center w-full cursor-pointer mb-8"
         onClick={() => {
-          setActive(8);
+          setActive(8) || logoutHandler();
         }}
       >
         <AiOutlineLogin size={20} color={active === 8 ? "red" : ""} />
