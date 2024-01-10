@@ -18,7 +18,10 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 //imports
 const user = require("./controller/userController");
+const shop = require("./controller/shopController.js");
+
 app.use("/api/v2/user", user);
+app.use("/api/v2/shop", shop);
 
 // config
 if (process.env.NODE_ENV !== "PRODUCTION") {
