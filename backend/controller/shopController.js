@@ -10,15 +10,15 @@ const { isAuthenticated } = require("../middlewares/auth");
 const ErrorHandler = require("../utils/ErrorHandler");
 const Shop = require("../model/shopModel");
 const catchAsyncError = require("../middlewares/catchAsyncError");
-const { log } = require("console");
 
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
+  console.log(req);
   try {
     const { email, phoneNumber, zipCode, avatar, address, password, name } =
       req.body;
     console.log(
       "🚀 ~ file: shopController.js:73 ~ router.post ~ req.body:",
-      req.body
+      req.file
     );
     const isEmailExsist = await Shop.findOne({ email });
 
@@ -107,7 +107,7 @@ router.post(
       const { name, email, password, avatar, zipCode, address, phoneNumber } =
         newShop;
       console.log(
-        "🚀 ~ file: shopController.js:124 ~ catchAsyncError ~ newShop:",
+        "🚀 ~ file: shopController.js:109 ~ catchAsyncError ~ newShop:",
         newShop
       );
 

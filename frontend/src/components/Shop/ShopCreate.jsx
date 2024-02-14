@@ -6,52 +6,51 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { server } from "../../server";
 import { RxAvatar } from "react-icons/rx";
+import { useForm } from "react-hook-form";
 const ShopCreate = () => {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [zipCode, setZipCode] = useState();
-  const [avatar, setAvatar] = useState();
-  const [phoneNumber, setPhoneNumber] = useState();
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const [avatar, setAvatar] = useState(null);
   const [visible, setVisible] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleFileInputChange = (e) => {
+  const handleFileInputChange = async (e) => {
     const file = e.target.files[0];
+    console.log("🚀 ~ handleFileInputChange ~ file:", file);
+
     setAvatar(file);
+    console.log("🚀 ~ handleFileInputChange ~ avatar:", avatar);
   };
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (data, e) => {
     e.preventDefault();
     const config = { headers: { "Content-Type": "multipart/form-data" } };
-    const newForm = new FormData();
+    console.log("🚀 ~ submitHandler ~ avatar:", avatar);
+    const formData = new FormData();
+    // console.log("🚀 ~ submitHandler ~ formData:", formData);
 
-    newForm.append("shopname", name);
-    newForm.append("email", email);
-    newForm.append("password", password);
-    newForm.append("file", avatar);
-    newForm.append("zipcode", zipCode);
-    newForm.append("address", address);
-    newForm.append("phonenumber", phoneNumber);
+    formData.append("file", avatar); // 'file' should match the key specified in upload.single("file")
+    console.log("🚀 ~ submitHandler ~ formData:", formData);
+
+    // Append other form data properties to formData
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
 
     console.log(
-      "🚀 ~ file: ShopCreate.jsx:30 ~ submitHandler ~ newForm:",
-      newForm
+      "🚀 ~ file: ShopCreate.jsx:30 ~ submitHandler ~ FormData:",
+      formData
     );
 
     axios
-      .post(`${server}/shop/create-shop`, newForm, config)
+      .post(`${server}/shop/create-shop`, data, config)
       .then((res) => {
         toast.success(res.data.message);
-        setName("");
-        setEmail("");
-        setPassword("");
-        setAvatar(null);
-        setPhoneNumber();
-        setAddress("");
-        setZipCode();
       })
       .catch((error) => {
         toast.error(error.response.data.message);
@@ -66,30 +65,35 @@ const ShopCreate = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[35rem]">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={submitHandler}>
+          <form
+            className="space-y-6"
+            onSubmit={handleSubmit((data, e) => {
+              submitHandler(data, e);
+            })}
+          >
             <div className="block text-sm font-medium text-gray-700">
-              <label htmlFor="email">Shop Name</label>
+              <label htmlFor="shopName">Shop Name</label>
               <div className="mt-1">
                 <input
+                  id="ShopName"
                   type="name"
-                  name="name"
-                  required
-                  value={name}
+                  {...register("ShopName", {
+                    required: "ShopName is required",
+                  })}
+                  // value={name}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
             </div>
             <div className="block text-sm font-medium text-gray-700">
-              <label htmlFor="email">Phone Number</label>
+              <label htmlFor="phoneNumber">Phone Number</label>
               <div className="mt-1">
                 <input
                   type="number"
-                  name="phone-number"
-                  required
-                  value={phoneNumber}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  {...register("PhoneNumber", {
+                    required: "PhoneNumber is required",
+                  })}
                 />
               </div>
             </div>
@@ -98,24 +102,24 @@ const ShopCreate = () => {
               <div className="mt-1">
                 <input
                   type="address"
-                  name="address"
-                  required
-                  value={address}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  onChange={(e) => setAddress(e.target.value)}
+                  {...register("address", {
+                    required: "address is required",
+                  })}
                 />
               </div>
             </div>
             <div className="block text-sm font-medium text-gray-700">
-              <label htmlFor="zip-code">Zip Code</label>
+              <label htmlFor="zipCode">Zip Code</label>
               <div className="mt-1">
                 <input
                   type="number"
-                  name="zip-code"
+                  name="zipCode"
                   required
-                  value={zipCode}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  onChange={(e) => setZipCode(e.target.value)}
+                  {...register("ZipCode", {
+                    required: "ZipCode is required",
+                  })}
                 />
               </div>
             </div>
@@ -124,11 +128,10 @@ const ShopCreate = () => {
               <div className="mt-1">
                 <input
                   type="email"
-                  name="email"
-                  required
-                  value={email}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email", {
+                    required: "email is required",
+                  })}
                 />
               </div>
             </div>
@@ -140,10 +143,10 @@ const ShopCreate = () => {
                   type={visible ? "text" : "password"}
                   name="password"
                   autoComplete="current-password"
-                  required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password", {
+                    required: "password is required",
+                  })}
                 />
                 {visible ? (
                   <AiOutlineEye

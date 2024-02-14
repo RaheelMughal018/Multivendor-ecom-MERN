@@ -19,7 +19,7 @@ const ActivationPage = () => {
         console.log("Activation success:", res.data.message);
         toast.success("Account created successfully");
       } catch (error) {
-        console.error(
+        console.log(
           "Activation error:",
           error.response.data.error || "Unknown error"
         );
